@@ -1,33 +1,28 @@
 <### 
- # SHT_NetAdapterBinding - A DSC resource for modifying network adapter bindings.
- #
- # Authored by: M.T.Nielsen - mni@systemhosting.dk
+ # SHT_NetAdapter - A DSC resource for enabling/disabling network adapters.
+ # Authored by: Dennis Rye - dry@systemhosting.dk
  #>
 
 function Get-TargetResource
 {
+    [CmdletBinding()]
 	param
-	(
+	(		
 		[Parameter(Mandatory)]
 		[ValidateNotNullOrEmpty()]
-		[string]$InterfaceAlias,
-
-		[Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-		[string]$ComponentID,
+        [string]$InterfaceAlias,
 
         [Parameter(Mandatory)]
         [bool]$Enabled
 	)
-	
+
     Write-Verbose 'Get-TargetResource'
     foreach ($k in $PSBoundParameters.GetEnumerator()) {
         Write-Verbose ('{0} - {1}' -f $k.Key, $k.Value)
     }
-    
+	
     return @{
         InterfaceAlias = $InterfaceAlias
-        ComponentID = $ComponentID
         Enabled = $Enabled
     }
 }
@@ -35,6 +30,7 @@ function Get-TargetResource
 
 function Set-TargetResource
 {
+    [CmdletBinding()]
 	param
 	(
 		[Parameter(Mandatory)]
@@ -42,33 +38,33 @@ function Set-TargetResource
         [string]$InterfaceAlias,
 
         [Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-        [string]$ComponentID,
-
-        [Parameter(Mandatory)]
         [bool]$Enabled
 	)
-
+    
     Write-Verbose 'Set-TargetResource'
     foreach ($k in $PSBoundParameters.GetEnumerator()) {
         Write-Verbose ('{0} - {1}' -f $k.Key, $k.Value)
     }
 
-    Get-NetAdapter -InterfaceAlias $InterfaceAlias | Get-NetAdapterBinding -ComponentID $ComponentID | Set-NetAdapterBinding -Enabled $Enabled
+    if ($Enabled) {
+        Write-Verbose "Enabling $($InterfaceAlias)"
+        Enable-NetAdapter -Name $InterfaceAlias
+    }
+    else {
+        Write-Verbose "Disabling ($InterfaceAlias)"
+        Disable-NetAdapter -Name $InterfaceAlias
+    }
 }
 
 
 function Test-TargetResource
 {
+    [CmdletBinding()]
     param
-	(
+	(		
 		[Parameter(Mandatory)]
 		[ValidateNotNullOrEmpty()]
-        [string]$InterfaceAlias,
-
-        [Parameter(Mandatory)]
-		[ValidateNotNullOrEmpty()]
-        [string]$ComponentID,
+		[string]$InterfaceAlias,
 
         [Parameter(Mandatory)]
         [bool]$Enabled
@@ -79,18 +75,19 @@ function Test-TargetResource
         Write-Verbose ('{0} - {1}' -f $k.Key, $k.Value)
     }
 
-    $binding = Get-NetAdapter -InterfaceAlias $InterfaceAlias | Get-NetAdapterBinding -ComponentID $ComponentID
-
-    if($binding -eq $null) { 
-        throw "ComponentID $ComponentID not supported. Use `"Get-NetAdapter -InterfaceAlias '$InterfaceAlias' | Get-NetAdapterBinding | Format-Table DisplayName, ComponentID, Enabled`" to get a list of supported components." 
+    $adapterEnabled = $false
+            
+    if ((Get-NetAdapter -Name $InterfaceAlias).AdminStatus -eq 'Up') {
+        Write-Verbose 'NetAdapter is enabled'
+        $adapterEnabled = $true
+    }
+    else {
+        Write-Verbose 'NetAdapter is disabled'
     }
 
-    $testResult = [bool]($binding.Enabled -eq $Enabled)
-
-    Write-Verbose "Test-TargetResource - Value match: $testResult"
-
-    return $testResult
+    return $adapterEnabled -eq $Enabled
 }
 
 
+#  FUNCTIONS TO BE EXPORTED 
 Export-ModuleMember -function Get-TargetResource, Set-TargetResource, Test-TargetResource

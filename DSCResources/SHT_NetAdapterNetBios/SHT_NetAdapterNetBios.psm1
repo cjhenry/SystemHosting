@@ -1,6 +1,7 @@
 <### 
- # SHT_DnsClient - A DSC resource for modifying the IPv4 Dns Client settings on a network adapter.
- # Authored by: M.T.Nielsen - mni@systemhosting.dk
+ # SHT_NetAdapterNetBios - A DSC resource for modifying the IPv4 NetBios settings.
+ #
+ # Authored by: Martin T. Nielsen - mni@systemhosting.dk
  #>
 
 function Get-TargetResource
@@ -10,22 +11,21 @@ function Get-TargetResource
 	(		
 		[Parameter(Mandatory)]
 		[ValidateNotNullOrEmpty()]
-        [string]$InterfaceAlias
+        [string]$InterfaceAlias,
+
+        [Parameter(Mandatory)]
+        [ValidateSet('Default','Enabled','Disabled')]
+        [string]$NetBios
 	)
 	
-    Write-Verbose "Get-TargetResource - InterfaceAlias: $InterfaceAlias"
-
-    $configuration = GetNetworkAdapterConfiguration -InterfaceAlias $InterfaceAlias
-    
-    switch($configuration.TcpipNetbiosOptions) {
-        0 { $netBios = 'Default' }
-        1 { $netBios = 'Enabled' }
-        2 { $netBios = 'Disabled' }
+    Write-Verbose 'Get-TargetResource'
+    foreach ($k in $PSBoundParameters.GetEnumerator()) {
+        Write-Verbose ('{0} - {1}' -f $k.Key, $k.Value)
     }
 
     Write-Output @{
         InterfaceAlias = $InterfaceAlias
-        NetBIOS = $netBios
+        NetBIOS = $NetBios
     }
 }
 
@@ -44,7 +44,10 @@ function Set-TargetResource
         [string]$NetBios
 	)
 
-    Write-Verbose "Set-TargetResource"
+    Write-Verbose 'Set-TargetResource'
+    foreach ($k in $PSBoundParameters.GetEnumerator()) {
+        Write-Verbose ('{0} - {1}' -f $k.Key, $k.Value)
+    }
 
     $configuration = GetNetworkAdapterConfiguration -InterfaceAlias $InterfaceAlias
 
@@ -73,7 +76,10 @@ function Test-TargetResource
         [string]$NetBios
 	)
 
-    Write-Verbose "Test-TargetResource"
+    Write-Verbose 'Test-TargetResource'
+    foreach ($k in $PSBoundParameters.GetEnumerator()) {
+        Write-Verbose ('{0} - {1}' -f $k.Key, $k.Value)
+    }
 
     $configuration = GetNetworkAdapterConfiguration -InterfaceAlias $InterfaceAlias
 

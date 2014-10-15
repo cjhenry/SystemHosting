@@ -1,6 +1,7 @@
-<### 
+<#
  # SHT_DnsClient - A DSC resource for modifying the IPv4 Dns Client settings on a network adapter.
- # Authored by: M.T.Nielsen - mni@systemhosting.dk
+ #
+ # Authored by: Martin T. Nielsen - mni@systemhosting.dk
  #>
 
 function Get-TargetResource
@@ -10,16 +11,25 @@ function Get-TargetResource
 	(		
 		[Parameter(Mandatory)]
 		[ValidateNotNullOrEmpty()]
-        [string]$InterfaceAlias
+        [string]$InterfaceAlias,
+
+        [Parameter(Mandatory)]
+        [bool]$RegisterThisConnectionAddress,
+
+        [Parameter(Mandatory)]
+        [bool]$UseSuffixWhenRegistering
+
 	)
 	
-    Write-Verbose "Get-TargetResource - InterfaceAlias: $InterfaceAlias"
-    $properties = Get-DnsClient -InterfaceAlias $InterfaceAlias
+    Write-Verbose 'Get-TargetResource'
+    foreach ($k in $PSBoundParameters.GetEnumerator()) {
+        Write-Verbose ('{0} - {1}' -f $k.Key, $k.Value)
+    }
     
-    Write-Output @{
-        InterfaceAlias = $properties.InterfaceAlias
-        RegisterThisConnectionAddress = $properties.RegisterThisConnectionAddress
-        UseSuffixWhenRegistering = $properties.UseSuffixWhenRegistering
+    return @{
+        InterfaceAlias = $InterfaceAlias
+        RegisterThisConnectionAddress = $RegisterThisConnectionAddress
+        UseSuffixWhenRegistering = $UseSuffixWhenRegistering
     }
 }
 
@@ -33,12 +43,17 @@ function Set-TargetResource
 		[ValidateNotNullOrEmpty()]
         [string]$InterfaceAlias,
 
-        # Windows default values:
-        [bool]$RegisterThisConnectionAddress = $true,
-        [bool]$UseSuffixWhenRegistering = $false
-	)
+        [Parameter(Mandatory)]
+        [bool]$RegisterThisConnectionAddress,
 
-    Write-Verbose "Set-TargetResource - InterfaceAlias: $InterfaceAlias, RegisterThisConnectionAddress: $RegisterThisConnectionAddress, UseSuffixWhenRegistering: $UseSuffixWhenRegistering"
+        [Parameter(Mandatory)]
+        [bool]$UseSuffixWhenRegistering
+	)
+    
+    Write-Verbose 'Set-TargetResource'
+    foreach ($k in $PSBoundParameters.GetEnumerator()) {
+        Write-Verbose ('{0} - {1}' -f $k.Key, $k.Value)
+    }
 
     Get-DnsClient -InterfaceAlias $InterfaceAlias | Set-DnsClient -UseSuffixWhenRegistering $UseSuffixWhenRegistering -RegisterThisConnectionsAddress $RegisterThisConnectionAddress
 }
@@ -53,12 +68,17 @@ function Test-TargetResource
 		[ValidateNotNullOrEmpty()]
 		[string]$InterfaceAlias,
 
-        # Windows default values:
-        [bool]$RegisterThisConnectionAddress = $true,
-        [bool]$UseSuffixWhenRegistering = $false
+        [Parameter(Mandatory)]
+        [bool]$RegisterThisConnectionAddress,
+
+        [Parameter(Mandatory)]
+        [bool]$UseSuffixWhenRegistering
 	)
 
-    Write-Verbose "Test-TargetResource - InterfaceAlias: $InterfaceAlias, RegisterThisConnectionAddress: $RegisterThisConnectionAddress, UseSuffixWhenRegistering: $UseSuffixWhenRegistering"
+    Write-Verbose 'Test-TargetResource'
+    foreach ($k in $PSBoundParameters.GetEnumerator()) {
+        Write-Verbose ('{0} - {1}' -f $k.Key, $k.Value)
+    }
 
     $properties = Get-DnsClient -InterfaceAlias $InterfaceAlias
 
