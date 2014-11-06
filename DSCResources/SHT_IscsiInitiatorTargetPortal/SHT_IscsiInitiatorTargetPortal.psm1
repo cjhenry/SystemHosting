@@ -129,6 +129,12 @@ function Set-TargetResource
         foreach ($t in $Targets) {
             $sessions = Get-IscsiTarget -NodeAddress $t.NodeAddress | Get-IscsiSession -ErrorAction SilentlyContinue
 
+            if ($t.InterfaceAlias -ne $null) {
+                $t.InitiatorPortalAddress = foreach ($ia in $t.InterfaceAlias) {
+                    Write-Output (Get-InitiatorPortalAddressFromInterfaceAlias -InterfaceAlias $ia)
+                }
+            }
+
             foreach ($initiator in $t.InitiatorPortalAddress) {
                 $connectInitiator = $false
 
@@ -229,6 +235,12 @@ function Test-TargetResource
                     
                 if (-not (Test-IscsiTargetAvailable -NodeAddress $t.NodeAddress)) {
                     throw ('No available target found that matches {0} on target portal {1}:{2}' -f $t.NodeAddress, $TargetPortalAddress, $TargetPortalPortNumber)
+                }
+            }
+
+            if ($t.InterfaceAlias -ne $null) {
+                $t.InitiatorPortalAddress = foreach ($ia in $t.InterfaceAlias) {
+                    Write-Output (Get-InitiatorPortalAddressFromInterfaceAlias -InterfaceAlias $ia)
                 }
             }
 

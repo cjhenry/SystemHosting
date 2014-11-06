@@ -1,6 +1,6 @@
 <#
  # SHT_AllowedServices - A DSC resource for configuring a service whitelist.
- # Reports a warning in the Application eventlog, and can optionally enforce the list by shutting down
+ # Reports a warning in the eventlog, and can optionally enforce the list by shutting down
  # unregistered services.
  #
  # Authored by: Martin T. Nielsen - mni@systemhosting.dk

@@ -27,6 +27,11 @@ _Alias: cGroup_
 A modified version of the MSFT_GroupResource DSC resource containing the following bugfix:
 https://connect.microsoft.com/PowerShell/feedbackdetail/view/951681/desired-state-configuration-group-resource
 
+### SHT_GUICheck
+_Alias: cGUICheck_
+
+A resource for detecting and, if Enforce is $true, removing the GUI from a Windows Server installation. Writes an eventlog entry if the GUI is detected, and another if it is removed.
+
 ### SHT_IscsiInitiatorTargetPortal
 _Alias: cIscsiInitiatorTargetPortal_
 
