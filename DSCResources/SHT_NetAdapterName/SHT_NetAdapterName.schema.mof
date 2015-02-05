@@ -1,0 +1,7 @@
+[ClassVersion("1.0.0"), FriendlyName("cNetAdapterName")] 
+class SHT_NetAdapterName : OMI_BaseResource
+{
+  [key] String MACAddress;
+  [required] String InterfaceAlias;
+  [write] boolean PhysicalNetAdapterOnly;
+};
