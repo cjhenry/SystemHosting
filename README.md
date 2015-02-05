@@ -57,6 +57,11 @@ _Alias: cNetAdapterBinding_
 
 A DSC resource for modifying network adapter bindings.
 
+### SHT_NetAdapterName
+_Alias: cNetAdapterName_
+
+A DSC resource for renaming network adapters based on their MAC.
+
 ### SHT_NetAdapterNetBios
 _Alias: cNetAdapterNetBios_
 
